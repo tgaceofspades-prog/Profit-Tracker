@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17365D">
+<title>Customer Accounts Manager</title>
+<style>
+:root{--navy:#17365D;--blue:#5B9BD5;--bg:#F4F7FB;--card:#fff;--text:#1f2937;--muted:#6b7280;--green:#2E8B57;--red:#B42318;--line:#E5E7EB;--amber:#D97706;--purple:#7C3AED}
+*{box-sizing:border-box}body{margin:0;font-family:Calibri,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text)}
+.app{min-height:100vh;display:grid;grid-template-columns:245px 1fr}.sidebar{background:var(--navy);color:#fff;padding:22px 15px;position:sticky;top:0;height:100vh}.brand{font-size:21px;font-weight:800;margin:0 8px 25px}.navbtn{width:100%;border:0;background:transparent;color:#dbeafe;padding:13px 14px;border-radius:10px;text-align:left;font-size:15px;margin:4px 0;cursor:pointer}.navbtn.active,.navbtn:hover{background:rgba(255,255,255,.12);color:#fff}
+.main{padding:24px;max-width:1550px;width:100%}.page.hidden{display:none}.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}h1{font-size:26px;margin:0}.sub{color:var(--muted);font-size:13px}.grid{display:grid;gap:15px}.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}.dashboard-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 4px 18px rgba(23,54,93,.05)}.kpi-label{font-size:12px;color:var(--muted);text-transform:uppercase}.kpi-value{font-size:26px;font-weight:800;color:var(--navy);margin-top:7px}.danger-text{color:var(--red)}.good-text{color:var(--green)}
+.two{grid-template-columns:1fr 1fr;margin-top:15px}.three{grid-template-columns:repeat(3,1fr);margin-top:15px}
+label{display:block;font-size:12px;font-weight:700;margin-bottom:6px;color:#374151}input,select,textarea{width:100%;padding:11px 12px;border:1px solid #CBD5E1;border-radius:10px;background:#fff;font-size:14px;font-family:inherit}textarea{min-height:85px;resize:vertical}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.full{grid-column:1/-1}.date-picker{display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:7px}.date-picker.date-two{grid-template-columns:1.3fr 1fr}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}.btn{border:0;border-radius:10px;padding:10px 15px;font-weight:700;cursor:pointer;font-family:inherit}.btn.blue{background:var(--navy);color:#fff}.btn.green{background:var(--green);color:#fff}.btn.secondary{background:#E5E7EB}.btn.purple{background:var(--purple);color:#fff}.btn.danger{background:#FEE2E2;color:#991B1B}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}th{background:#F8FAFC;color:#475569;position:sticky;top:0}.table-wrap{overflow:auto;max-height:560px}.pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700}.inv{background:#FEE2E2;color:#991B1B}.pay{background:#DCFCE7;color:#166534}.open{background:#DBEAFE;color:#1D4ED8}.archive{background:#F3F4F6;color:#4B5563}
+.balance-box{border-radius:12px;padding:16px;border:1px solid var(--line)}.balance-box .amount{font-size:25px;font-weight:800;margin-top:4px}.balance-due{background:#FFF4F2}.balance-credit{background:#F0FDF4}.balance-zero{background:#F8FAFC}
+.bar-row{display:grid;grid-template-columns:120px 1fr 130px;gap:10px;align-items:center;margin:10px 0;font-size:12px}.bar{height:10px;background:#E5E7EB;border-radius:99px;overflow:hidden}.bar span{display:block;height:100%;background:var(--blue)}
+.list-manager{display:grid;grid-template-columns:1fr auto;gap:8px}.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.chip{background:#EEF4FB;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:700;color:var(--navy)}.chip button{border:0;background:transparent;color:#991B1B;cursor:pointer;font-weight:900}
+.report-controls{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.report-sheet{background:#fff;max-width:1120px;margin:15px auto;padding:22px;border:1px solid var(--line);border-radius:12px}.report-head{display:flex;justify-content:space-between;border-bottom:2px solid var(--navy);padding-bottom:10px}.report-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:13px 0}.summary-box{background:#F8FAFC;border:1px solid var(--line);border-radius:9px;padding:10px}.summary-box b{display:block;font-size:17px;color:var(--navy)}
+.notice{padding:11px;border-radius:10px;background:#EFF6FF;color:#1E3A8A;font-size:13px}
+
+.modal-backdrop.hidden{display:none!important}.modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);display:grid;place-items:center;z-index:100;padding:18px}
+.modal{background:#fff;border-radius:16px;max-width:760px;width:100%;max-height:90vh;overflow:auto;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.modal h2{margin:0 0 16px;color:var(--navy)}.modal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.modal .full{grid-column:1/-1}
+@media(max-width:700px){.modal-grid{grid-template-columns:1fr}}
+
+
+.excel-view-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.excel-view-tab{background:#E5E7EB;color:#17365D;border:0;border-radius:8px;padding:9px 13px;font-weight:700;cursor:pointer}
+.excel-view-tab.active{background:#17365D;color:#fff}
+.excel-image-wrap{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;overflow:auto}
+.excel-image-wrap img{display:block;max-width:none;height:auto;user-select:none;pointer-events:none}
+
+
+
+@media(max-width:1000px){.app{grid-template-columns:78px 1fr}.brand{font-size:0}.brand:after{content:'CB';font-size:20px}.navbtn{font-size:0;text-align:center}.navbtn:before{font-size:20px}.navbtn[data-page="dashboard"]:before{content:'▦'}.navbtn[data-page="accounts"]:before{content:'◎'}.navbtn[data-page="newpi"]:before{content:'＋'}.navbtn[data-page="pilist"]:before{content:'▤'}.navbtn[data-page="payment"]:before{content:'↓'}.navbtn[data-page="unitprice"]:before{content:'∑'}.navbtn[data-page="transactions"]:before{content:'≡'}.navbtn[data-page="reports"]:before{content:'▤'}.navbtn[data-page="settings"]:before{content:'⚙'}.kpis{grid-template-columns:repeat(2,1fr)}.three{grid-template-columns:1fr}}
+@media(max-width:700px){.app{display:block}.sidebar{height:auto;position:fixed;z-index:20;bottom:0;top:auto;left:0;right:0;display:flex;padding:6px;overflow:auto}.brand{display:none}.navbtn{min-width:52px;margin:0;padding:10px}.main{padding:15px 13px 80px}.two,.kpis,.form-grid,.report-controls,.report-summary{grid-template-columns:1fr}.date-picker{grid-template-columns:1fr}.topbar{align-items:flex-start;flex-direction:column}}
+/* iPhone / iOS mobile-first enhancements */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent;}
+button,input,select,textarea{font-size:16px;} /* prevents iOS Safari input zoom */
+button,.btn,.navbtn{touch-action:manipulation;min-height:44px;}
+
+@media(max-width:700px){
+  body{background:#F4F7FB;}
+  .app{display:block;min-height:100dvh;}
+  .main{padding:14px 12px calc(92px + env(safe-area-inset-bottom));max-width:none;overflow-x:hidden;}
+  .sidebar{height:auto;position:fixed;z-index:1000;bottom:0;top:auto;left:0;right:0;display:flex;gap:4px;padding:7px 8px calc(7px + env(safe-area-inset-bottom));overflow-x:auto;overflow-y:hidden;background:rgba(23,54,93,.97);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:0 -8px 24px rgba(15,23,42,.14);scrollbar-width:none;}
+  .sidebar::-webkit-scrollbar{display:none}.brand,.sidebar>.btn.secondary{display:none!important;}
+  .navbtn{flex:0 0 64px;min-width:64px;height:54px;margin:0;padding:5px 4px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:9px!important;line-height:1.05;text-align:center;color:#dbeafe;white-space:normal;}
+  .navbtn:before{font-size:19px!important;line-height:1}.navbtn.active{background:rgba(255,255,255,.16);color:#fff;}
+  .navbtn[data-page="dashboard"]:before{content:'▦'}.navbtn[data-page="accounts"]:before{content:'◎'}.navbtn[data-page="newpi"]:before{content:'＋'}.navbtn[data-page="pilist"]:before{content:'▤'}.navbtn[data-page="payment"]:before{content:'↓'}.navbtn[data-page="unitprice"]:before{content:'∑'}.navbtn[data-page="transactions"]:before{content:'≡'}.navbtn[data-page="reports"]:before{content:'▧'}.navbtn[data-page="settings"]:before{content:'⚙'}
+  .topbar{align-items:stretch;flex-direction:column;gap:10px;margin-bottom:13px}.topbar .actions{width:100%;margin-top:0}.topbar .actions .btn{flex:1 1 140px;}
+  h1{font-size:22px;line-height:1.2}.sub{font-size:12px;line-height:1.45}.card{border-radius:14px;padding:14px;box-shadow:0 2px 12px rgba(23,54,93,.05)}
+  .two,.three,.kpis,.dashboard-kpis,.form-grid,.report-controls,.report-summary,.modal-grid{grid-template-columns:1fr!important;}
+  .date-picker,.date-picker.date-two{grid-template-columns:1fr 1fr;}
+  input,select,textarea{min-height:46px;padding:11px 12px;border-radius:11px;font-size:16px;}
+  textarea{min-height:100px}.actions{gap:8px}.actions .btn{min-height:46px;padding:11px 14px;}
+  .list-manager{grid-template-columns:1fr auto}.list-manager .btn{min-width:70px;}
+  .table-wrap{width:100%;max-height:none;overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;border-radius:12px;}
+  table{min-width:720px;font-size:12px}th,td{padding:10px 9px}.card.table-wrap{padding:0}.card.table-wrap table{margin:0;}
+  #dashboard .table-wrap table{min-width:620px}#accounts table{min-width:760px}#pilist table{min-width:1050px}#transactions table{min-width:1250px}#unitprice table{min-width:1000px}.report-sheet table{min-width:1000px}
+  .report-sheet{margin:12px 0;padding:14px;overflow-x:auto}.report-head{min-width:720px}.report-summary{min-width:0}.summary-box b{font-size:18px;}
+  .bar-row{grid-template-columns:90px minmax(110px,1fr) 90px;gap:7px;}
+  .modal-backdrop{padding:0;align-items:end}.modal{width:100%;max-width:none;max-height:92dvh;border-radius:20px 20px 0 0;padding:18px 14px calc(18px + env(safe-area-inset-bottom));}
+  .modal h2{font-size:21px}.modal .actions{position:sticky;bottom:0;background:#fff;padding-top:8px;padding-bottom:2px;}
+  #dashCustomer,#piSearch,#txnSearch{max-width:none!important;width:100%;}
+  .kpi-value,.balance-box .amount{font-size:24px;overflow-wrap:anywhere}.full{grid-column:auto;}
+}
+
+@media(max-width:390px){
+  .main{padding-left:10px;padding-right:10px}.card{padding:12px}.navbtn{flex-basis:60px;min-width:60px}.date-picker,.date-picker.date-two{grid-template-columns:1fr 1fr}.report-head{min-width:660px}
+}
+
+@media print{body{background:#fff}.sidebar,.topbar,.report-controls,.no-print{display:none!important}.app{display:block}.main{padding:0;max-width:none}.page{display:none!important}#reports{display:block!important}.report-sheet{display:block!important;border:0;margin:0;padding:7mm;max-width:none}.report-sheet table{font-size:9px}.report-sheet th,.report-sheet td{padding:4px}@page{size:A4 landscape;margin:8mm}}
+</style>
+<link rel="manifest" href="./manifest.json">
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<div class="brand">Customer Accounts</div>
+<button class="navbtn active" data-page="dashboard">Dashboard</button>
+<button class="navbtn" data-page="accounts">Accounts</button>
+<button class="navbtn" data-page="newpi">CI Entry</button>
+<button class="navbtn" data-page="pilist">CI List</button>
+<button class="navbtn" data-page="payment">Payment Entry</button>
+<button class="navbtn" data-page="transactions">Payment List</button>
+<button class="navbtn" data-page="unitprice">Unit Price Estimation</button>
+<button class="navbtn" data-page="reports">Reports</button>
+<button class="navbtn" data-page="settings">Settings</button>
+<button class="btn secondary" style="position:absolute;bottom:18px;left:16px;right:16px" onclick="exitApp()">Exit / Close App</button>
+</aside>
+<main class="main">
+
+<section id="dashboard" class="page">
+
+
+
+<div class="topbar">
+<div><h1>Customer Accounts Dashboard</h1><div class="sub">Current balances by customer and currency.</div></div>
+<select id="dashCustomer" style="max-width:260px"></select>
+</div>
+<div class="grid kpis dashboard-kpis">
+<div class="card"><div class="kpi-label">Current USD Balance</div><div class="kpi-value" id="kpiUSD">0</div></div>
+<div class="card"><div class="kpi-label">Current IRR Balance</div><div class="kpi-value" id="kpiIRR">0</div></div>
+</div>
+
+<div class="card" style="margin-top:15px">
+  <div class="topbar" style="margin-bottom:10px">
+    <div><h3 style="margin:0">Customers with Outstanding Balance</h3>
+    <div class="sub">Up to 10 customers with total outstanding balance and the remaining balance of their latest CI.</div></div>
+  </div>
+  <div class="table-wrap" style="max-height:none">
+    <table>
+      <thead><tr><th>Customer</th><th>Currency</th><th>Total Customer Balance</th><th>Latest CI</th><th>Latest CI Balance</th></tr></thead>
+      <tbody id="debtors10Body"></tbody>
+      <tfoot id="debtors10Foot"></tfoot>
+    </table>
+  </div>
+</div>
+
+<div class="card" style="margin-top:15px">
+  <div class="topbar" style="margin-bottom:10px">
+    <div><h3 style="margin:0">Receipts – Last 2 Months</h3>
+    <div class="sub">Payments recorded in the two latest Jalali months.</div></div>
+  </div>
+  <div class="table-wrap" style="max-height:none">
+    <table>
+      <thead><tr><th>Month</th><th>Customer</th><th>Currency</th><th>Received</th></tr></thead>
+      <tbody id="last2MonthsBody"></tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<section id="accounts" class="page hidden">
+<div class="topbar"><div><h1>Accounts</h1><div class="sub">Balance by customer, currency and period.</div></div></div>
+<div class="card table-wrap"><table><thead><tr><th>Customer</th><th>Period</th><th>Currency</th><th>Invoiced</th><th>Received / Credit</th><th>Net Balance</th><th>Meaning</th></tr></thead><tbody id="accountsBody"></tbody></table></div>
+</section>
+
+
+<section id="newpi" class="page hidden">
+<div class="topbar"><div><h1>CI Entry</h1><div class="sub">Register a customer invoice.</div></div></div>
+<div class="card"><form id="piForm"><div class="form-grid">
+<div><label>Customer</label><select id="piCustomer" required></select></div>
+<div><label>Account Currency</label><select id="piCurrency" required></select></div>
+<div><label>Financial Period</label><select id="piPeriod" required></select></div>
+<div><label>Jalali Date</label><div class="date-picker date-two"><select id="piMonth"></select><select id="piDay"></select></div></div>
+<div><label>PI Number</label><input id="piReference"></div>
+<div><label>CI Number</label><input id="piNo" required></div>
+<div><label>Product</label><select id="piProduct"></select></div>
+<div><label>Info</label><input id="piInfo" type="text" placeholder="e.g. 25 MT"></div>
+<div><label>Invoice Amount</label><input id="piAmount" type="number" step="any" min="0" required></div>
+<div class="full"><label>Notes</label><textarea id="piNote"></textarea></div>
+</div><div class="actions"><button class="btn green" type="submit">Register CI</button><button class="btn secondary" type="button" onclick="document.getElementById('piForm').reset()">Clear</button></div></form></div>
+</section>
+
+
+
+
+<section id="pilist" class="page hidden">
+<div class="topbar">
+  <div><h1>CI List</h1><div class="sub">View, edit and delete CI records.</div></div>
+  <input id="piSearch" placeholder="Search customer, PI, CI, product..." style="max-width:320px">
+</div>
+<div class="card table-wrap">
+<table>
+<thead><tr><th>Date</th><th>Customer</th><th>Currency</th><th>PI Number</th><th>CI Number</th><th>Product</th><th>Info</th><th>Invoice Amount</th><th>Notes</th><th>Actions</th></tr></thead>
+<tbody id="piListBody"></tbody>
+</table>
+</div>
+</section>
+
+
+<section id="payment" class="page hidden">
+<div class="topbar"><div><h1>Payment Entry</h1><div class="sub">Add a credit / receipt to a customer account.</div></div></div>
+<div class="card"><form id="payForm"><div class="form-grid">
+<div><label>Customer</label><select id="payCustomer" required></select></div>
+<div><label>Account Currency</label><select id="payCurrency" required></select></div>
+<div><label>Financial Period</label><select id="payPeriod" required></select></div>
+<div><label>Jalali Date</label><div class="date-picker date-two"><select id="payMonth"></select><select id="payDay"></select></div></div>
+<div><label>CI Number</label><select id="payCI" required></select></div>
+<div><label>Payment Currency</label><select id="payOriginalCurrency"></select></div>
+<div><label>Original Amount</label><input id="payOriginalAmount" type="number" step="any" min="0"></div>
+<div><label>Payment Currency per Account Currency</label><input id="payFx" type="number" step="any" min="0" value="1"></div>
+<div><label>Credit in Account Currency</label><input id="payCredit" type="number" step="any" min="0" required></div>
+<div><label>USD / Received Currency Sale Rate to IRR</label><input id="payCurrencyToIRR" type="number" step="any" min="0" placeholder="For USD payment, enter USD sale rate to IRR"></div>
+<div class="full"><label>Notes</label><textarea id="payNote"></textarea></div>
+</div><div class="actions"><button class="btn green" type="submit">Register Payment</button><button class="btn secondary" type="button" onclick="document.getElementById('payForm').reset()">Clear</button></div></form></div>
+</section>
+
+
+<section id="unitprice" class="page hidden">
+<div class="topbar">
+  <div><h1>Unit Price Estimation</h1><div class="sub">Estimate effective IRR selling price per kg from the selected CI payment history. Enter the USD sale rate directly in the payment row below and click Save Rate.</div></div>
+</div>
+
+<div class="card">
+  <div class="form-grid">
+    <div><label>Customer</label><select id="upeCustomer"></select></div>
+<div><label>CI Number</label><select id="upeCI"></select></div>
+    <div><label>Received Currency</label><div class="total-box" id="upeCurrency">—</div></div>
+    <div><label>Average USD to IRR Rate (Simple)</label><div class="total-box" id="upeAvgUSDtoIRR">0</div></div>
+    <div><label>Average Other Currency to IRR Rate (Simple)</label><div class="total-box" id="upeAvgAEDtoIRR">0</div></div>
+    <div><label>Implied USD Rate from other currencies</label><div class="total-box" id="upeImpliedUSD">0</div></div>
+    <div><label>Unit Price (USD / kg)</label><input id="upeUnitPrice" type="number" step="any" min="0" placeholder="Enter unit price manually"></div>
+    <div><label>Unit Price in IRR</label><div class="balance-box balance-zero"><div class="amount" id="upeUnitPriceIRR">0</div></div></div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:15px">
+  <h3 style="margin-top:0">Selected CI Payment Data</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Date</th><th>Payment Currency</th><th>Original Amount</th><th>USD Credit</th><th>USD Sale Rate to IRR</th><th>Other Currency→IRR Rate</th><th>Implied USD Rate</th><th>Action</th></tr></thead>
+      <tbody id="upeBody"></tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+
+<section id="transactions" class="page hidden">
+<div class="topbar">
+  <div><h1>Payment List</h1><div class="sub">Payments only, newest first.</div></div>
+  <input id="txnSearch" placeholder="Search customer, CI, PI, currency..." style="max-width:320px">
+</div>
+<div class="card table-wrap">
+<table>
+<thead><tr><th>Date</th><th>Customer</th><th>Financial Period</th><th>Account Currency</th><th>CI Number</th><th>PI Number</th><th>Payment Currency</th><th>Original Amount</th><th>Account Amount</th><th>Sale Rate to IRR</th><th>Notes</th><th>Actions</th></tr></thead>
+<tbody id="txnBody"></tbody>
+</table>
+</div>
+</section>
+
+
+
+
+<section id="reports" class="page hidden">
+<div class="topbar"><div><h1>Reports</h1><div class="sub">Printable account statement / PDF.</div></div><div class="actions"><button class="btn blue" onclick="generateReport()">Generate Report</button><button class="btn purple" onclick="printReport()">Print / Save PDF</button></div></div>
+<div class="card report-controls">
+<div><label>Customer</label><select id="repCustomer"></select></div>
+<div><label>Currency</label><select id="repCurrency"></select></div>
+<div><label>Period</label><select id="repPeriod"></select></div>
+<div><label>From Date</label><input id="repFrom" placeholder="1405/01/01"></div>
+<div><label>To Date</label><input id="repTo" placeholder="1405/12/29"></div>
+</div>
+<div class="report-sheet">
+<div class="report-head"><div><h2 style="margin:0;color:#17365D">Customer Accounts Statement</h2><div id="repMeta" class="sub"></div></div><div id="repGenerated" class="sub"></div></div>
+<div class="report-summary"><div class="summary-box">Invoices<b id="repDebit">0</b></div><div class="summary-box">Payments / Credits<b id="repCredit">0</b></div><div class="summary-box">Net Balance<b id="repBalance">0</b></div><div class="summary-box">Transactions<b id="repCount">0</b></div></div>
+<table><thead><tr><th>Customer</th><th>Date</th><th>CI</th><th>Product</th><th>Info</th><th>Type</th><th>Debit</th><th>Credit</th><th>Running Balance</th><th>Notes</th></tr></thead><tbody id="repBody"></tbody></table>
+</div>
+</section>
+
+<section id="settings" class="page hidden">
+<div class="topbar"><div><h1>Settings</h1><div class="sub">Manage master lists and backups.</div></div></div>
+<div class="grid two">
+
+<div class="card">
+  <h3>Customers</h3>
+  <div class="sub" style="margin-bottom:10px">Add or remove customers used across CI Entry, Payment Entry and Reports.</div>
+  <div class="list-manager">
+    <input id="newCustomer" placeholder="New customer">
+    <button class="btn blue" onclick="addList('customers','newCustomer')">Add</button>
+  </div>
+  <div class="chips" id="customerChips"></div>
+</div>
+
+<div class="card"><h3>Products</h3><div class="sub" style="margin-bottom:10px">Add product names here for future CI entries.</div><div class="list-manager"><input id="newProduct" placeholder="New product"><button class="btn blue" onclick="addList('products','newProduct')">Add</button></div><div class="chips" id="productChips"></div></div>
+<div class="card"><h3>Financial Periods</h3><div class="sub" style="margin-bottom:10px">Add future Jalali financial years here, e.g. 1406, 1407.</div><div class="list-manager"><input id="newPeriod" placeholder="e.g. 1406"><button class="btn blue" onclick="addList('periods','newPeriod')">Add</button></div><div class="chips" id="periodChips"></div></div>
+
+<div class="card">
+  <h3>Account Currencies</h3>
+  <div class="sub" style="margin-bottom:10px">Add currencies for future CI and payment entries.</div>
+  <div class="list-manager">
+    <input id="newCurrency" placeholder="e.g. EUR">
+    <button class="btn blue" onclick="addList('currencies','newCurrency')">Add</button>
+  </div>
+  <div class="chips" id="currencyChips"></div>
+</div>
+
+
+
+
+
+<div class="card">
+  <h3>Opening Balance</h3>
+  <div class="sub" style="margin-bottom:10px">Register an opening balance for a customer without creating a CI.</div>
+  <div class="form-grid">
+    <div><label>Customer</label><select id="obCustomer"></select></div>
+    <div><label>Currency</label><select id="obCurrency"></select></div>
+    <div><label>Financial Period</label><select id="obPeriod"></select></div>
+    <div><label>Opening Balance</label><input id="obAmount" type="number" step="any" min="0" placeholder="Amount due from customer"></div>
+    <div class="full"><label>Notes</label><input id="obNote" placeholder="Optional note"></div>
+  </div>
+  <div class="actions"><button class="btn green" type="button" onclick="registerOpeningBalance()">Register Opening Balance</button></div>
+</div>
+
+
+<div class="card">
+  <h3>Payment Currencies</h3>
+  <div class="sub" style="margin-bottom:10px">Add currencies that customers may use for payment. Unit Price Estimation will use the selected currency conversion data.</div>
+  <div class="list-manager">
+    <input id="newPaymentCurrency" placeholder="e.g. EUR">
+    <button class="btn blue" onclick="addList('paymentCurrencies','newPaymentCurrency')">Add</button>
+  </div>
+  <div class="chips" id="paymentCurrencyChips"></div>
+</div>
+
+<div class="card"><h3>Backup</h3><div class="actions"><button class="btn blue" onclick="selectBackupFolder()">Select Backup Folder</button><button class="btn purple" onclick="exportBackup()">Export Backup</button><label class="btn secondary">Import Backup<input id="importBackup" type="file" accept=".json" hidden></label></div><div id="backupStatus" class="notice" style="margin-top:10px">On Microsoft Edge you can select a backup folder.</div></div>
+</div>
+</section>
+
+</main></div>
+<div id="editModalWrap" class="modal-backdrop hidden">
+  <div class="modal">
+    <h2>Edit Transaction</h2>
+    <input type="hidden" id="editTxnId">
+    <div class="modal-grid">
+      <div><label>Customer</label><select id="editCustomer"></select></div>
+<div><label>Type</label><select id="editType"><option>Invoice</option><option>Payment</option><option>Opening Balance</option></select></div>
+      <div><label>Currency</label><select id="editCurrency"></select></div>
+      <div><label>Period</label><select id="editPeriod"></select></div>
+      <div><label>Date (YYYY/MM/DD)</label><input id="editDate"></div>
+      <div><label>PI Number</label><input id="editReference"></div>
+      <div><label>CI Number</label><input id="editCI"></div>
+      <div><label>Product</label><select id="editProduct"></select></div>
+      <div><label>Debit</label><input id="editDebit" type="number" step="any"></div>
+<div><label>Info</label><input id="editInfo" type="text"></div>
+      <div><label>Credit</label><input id="editCredit" type="number" step="any"></div>
+      <div><label>Payment Currency</label><select id="editPaymentCurrency"></select></div>
+      <div><label>Original Amount</label><input id="editOriginalAmount" type="number" step="any"></div>
+      <div><label>FX Rate</label><input id="editFxRate" type="number" step="any"></div>
+<div><label>USD / Received Currency Sale Rate to IRR</label><input id="editCurrencyToIRR" type="number" step="any"></div>
+      <div class="full"><label>Notes</label><textarea id="editNote"></textarea></div>
+    </div>
+    <div class="actions">
+      <button class="btn green" onclick="saveTxnEdit()">Save Changes</button>
+      <button class="btn secondary" onclick="closeTxnEdit()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="deleteModalWrap" class="modal-backdrop hidden">
+  <div class="modal" style="max-width:460px">
+    <h2>Delete Transaction</h2>
+    <p id="deleteTxnInfo" style="line-height:1.6">Are you sure you want to delete this transaction?</p>
+    <input type="hidden" id="deleteTxnId">
+    <div class="actions">
+      <button class="btn danger" type="button" id="confirmDeleteBtn">Delete Permanently</button>
+      <button class="btn secondary" type="button" id="cancelDeleteBtn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const seedRecords=[];
+const seedLists={"customers":[],"currencies":["USD","IRR"],"paymentCurrencies":["USD","AED","IRR"],"products":["Skim Milk Powder","Whey Powder"],"periods":["1405"]};
+
+function appInstanceKey(){
+  const raw=(location.origin||'file') + location.pathname;
+  let hash=2166136261;
+  for(let i=0;i<raw.length;i++){
+    hash ^= raw.charCodeAt(i);
+    hash = Math.imul(hash,16777619);
+  }
+  return (hash>>>0).toString(36);
+}
+const APP_INSTANCE=appInstanceKey();
+const RECORDS_KEY='customer_ci_records_'+APP_INSTANCE;
+const LISTS_KEY='customer_ci_lists_'+APP_INSTANCE;
+let records=JSON.parse(localStorage.getItem('multi_customer_ci_records_v1')||'null')||seedRecords;
+let lists=JSON.parse(localStorage.getItem('multi_customer_ci_lists_v1')||'null')||seedLists;
+
+// Migrate previously saved browser data from the old currency code to IRR.
+records=records.map(r=>{
+  const x={...r};
+  if(String(x.currency||'').toUpperCase()==='I'+'RT') x.currency='IRR';
+  if(String(x.paymentCurrency||'').toUpperCase()==='I'+'RT') x.paymentCurrency='IRR';
+  return x;
+});
+['currencies','paymentCurrencies'].forEach(k=>{
+  if(Array.isArray(lists[k])){
+    lists[k]=[...new Set(lists[k].map(v=>String(v).toUpperCase()==='I'+'RT'?'IRR':v))];
+  }
+});
+localStorage.setItem('multi_customer_ci_records_v1',JSON.stringify(records));
+localStorage.setItem('multi_customer_ci_lists_v1',JSON.stringify(lists));
+const months=['Farvardin','Ordibehesht','Khordad','Tir','Mordad','Shahrivar','Mehr','Aban','Azar','Dey','Bahman','Esfand'];
+function $(id){return document.getElementById(id)}
+function fmt(n){return Number(n||0).toLocaleString('en-US',{maximumFractionDigits:2})}
+function save(){localStorage.setItem('multi_customer_ci_records_v1',JSON.stringify(records));localStorage.setItem('multi_customer_ci_lists_v1',JSON.stringify(lists));refreshLists();setupDate('pi');setupDate('pay');$('piPeriod').addEventListener('change',()=>updateDay('pi'));$('payPeriod').addEventListener('change',()=>updateDay('pay'));renderAll()}
+function fill(id,arr,placeholder='Select...'){const el=$(id);if(!el)return;const old=el.value;el.innerHTML=`<option value="">${placeholder}</option>`+arr.map(x=>`<option>${x}</option>`).join('');if(arr.includes(old))el.value=old}
+function refreshLists(){
+ fill('dashCustomer',lists.customers,'All Customers');
+ fill('piCustomer',lists.customers,'Select customer...');
+ fill('payCustomer',lists.customers,'Select customer...');
+ fill('repCustomer',lists.customers,'All Customers');
+ fill('upeCustomer',lists.customers,'Select customer...');
+ ['piCurrency','payCurrency','repCurrency'].forEach(id=>fill(id,lists.currencies,id==='repCurrency'?'All Currencies':'Select currency...'));
+ ['piPeriod','payPeriod','repPeriod'].forEach(id=>fill(id,lists.periods,id==='repPeriod'?'All Periods':'Select period...'));
+ fill('piProduct',lists.products,'Select product...');
+ fill('payOriginalCurrency',lists.paymentCurrencies,'Select payment currency...');
+ fill('obCustomer',lists.customers,'Select customer...');
+ fill('obCurrency',lists.currencies,'Select currency...');
+ fill('obPeriod',lists.periods,'Select period...');
+ fill('editCustomer',lists.customers);
+ fill('editCurrency',lists.currencies);
+ fill('editPeriod',lists.periods);
+ fill('editProduct',lists.products,'Select product...');
+ fill('editPaymentCurrency',lists.paymentCurrencies,'Select payment currency...');
+ renderChips();
+ refreshPaymentCIList();
+ refreshUnitPriceCIList();
+}
+function renderChips(){const map={customers:'customerChips',products:'productChips',periods:'periodChips',currencies:'currencyChips',paymentCurrencies:'paymentCurrencyChips'};for(const [k,id] of Object.entries(map))$(id).innerHTML=lists[k].map((x,i)=>`<span class="chip">${x}<button onclick="removeList('${k}',${i})">×</button></span>`).join('')}
+function addList(key,input){const v=$(input).value.trim();if(v&&!lists[key].some(x=>x.toLowerCase()===v.toLowerCase())){lists[key].push(v);$(input).value='';save()}}
+function removeList(key,i){if(confirm('Remove this item from future selections? Existing records stay unchanged.')){lists[key].splice(i,1);save()}}
+
+function setupDate(prefix){
+ const m=$(prefix+'Month'),d=$(prefix+'Day');
+ if(!m||!d)return;
+ m.innerHTML=months.map((x,i)=>`<option value="${i+1}">${String(i+1).padStart(2,'0')} - ${x}</option>`).join('');
+ m.value='1';updateDay(prefix);d.value='1';
+ m.addEventListener('change',()=>updateDay(prefix));
+}
+function leap(y){return [1,5,9,13,17,22,26,30].includes(y%33)}
+function updateDay(prefix){
+ const period=$(prefix+'Period');
+ const y=period?parseInt(period.value||'1405'):1405;
+ const m=+$(prefix+'Month').value,d=$(prefix+'Day'),prev=+d.value||1,max=m<=6?31:m<=11?30:(leap(y)?30:29);
+ d.innerHTML='';for(let x=1;x<=max;x++)d.innerHTML+=`<option>${x}</option>`;d.value=Math.min(prev,max);
+}
+function getDate(prefix){
+ const y=$(prefix+'Period').value;
+ return `${y}/${String($(prefix+'Month').value).padStart(2,'0')}/${String($(prefix+'Day').value).padStart(2,'0')}`;
+}
+setupDate('pi');setupDate('pay');$('piPeriod').addEventListener('change',()=>updateDay('pi'));$('payPeriod').addEventListener('change',()=>updateDay('pay'));
+
+document.querySelectorAll('.navbtn').forEach(b=>b.onclick=()=>go(b.dataset.page));
+function go(page){document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));$(page).classList.remove('hidden');document.querySelectorAll('.navbtn').forEach(x=>x.classList.toggle('active',x.dataset.page===page));if(page==='pilist')renderCIList();if(page==='unitprice'){refreshUnitPriceCIList();renderUnitPriceEstimation();}if(page==='reports')generateReport()}
+
+function currentRecords(customer=''){return records.filter(r=>!r.archived&&(!customer||r.customer===customer))}
+function accountBalance(rows){return rows.reduce((s,r)=>s+Number(r.credit||0)-Number(r.debit||0),0)}
+function groupBy(arr,keyfn){const m={};arr.forEach(x=>{const k=keyfn(x);(m[k]||(m[k]=[])).push(x)});return m}
+function balanceMeaning(v){return v>0?'Customer Credit':v<0?'Amount Due':'Settled'}
+function balanceClass(v){return v>0?'good-text':v<0?'danger-text':''}
+
+
+function renderLatest3CIs(){
+ const invoices=records
+   .filter(r=>!r.archived&&r.type==='Invoice'&&r.piNo&&r.piNo!=='Last Year'&&(!$('dashCustomer').value||r.customer===$('dashCustomer').value))
+   .slice()
+   .sort((a,b)=>{
+      const ad=(a.date||'').replaceAll('/',''),bd=(b.date||'').replaceAll('/','');
+      if(ad!==bd)return bd.localeCompare(ad);
+      return String(b.id||'').localeCompare(String(a.id||''));
+   });
+
+ // unique by CI + currency, keeping newest invoice record
+ const seen=new Set(), latest=[];
+ for(const inv of invoices){
+   const key=(inv.currency||'')+'|'+(inv.piNo||'');
+   if(seen.has(key))continue;
+   seen.add(key);
+   latest.push(inv);
+   if(latest.length===3)break;
+ }
+
+ $('latest3CIBody').innerHTML=latest.map(inv=>{
+   const relatedInvoices=records.filter(r=>!r.archived&&r.type==='Invoice'&&r.currency===inv.currency&&r.piNo===inv.piNo);
+   const relatedPayments=records.filter(r=>!r.archived&&r.type==='Payment'&&r.currency===inv.currency&&r.piNo===inv.piNo);
+   const invoiced=relatedInvoices.reduce((s,r)=>s+Number(r.debit||0),0);
+   const paid=relatedPayments.reduce((s,r)=>s+Number(r.credit||0),0);
+   const remaining=invoiced-paid;
+   const cls=remaining>0?'danger-text':remaining<0?'good-text':'';
+   return `<tr>
+     <td>${inv.customer||''}</td>
+     <td><b>${inv.piNo||''}</b></td>
+     <td>${inv.date||'-'}</td>
+     <td>${inv.currency||''}</td>
+     <td>${fmt(invoiced)}</td>
+     <td>${fmt(paid)}</td>
+     <td class="${cls}"><b>${fmt(remaining)}</b></td>
+   </tr>`;
+ }).join('') || '<tr><td colspan="7" class="sub">No CI records yet.</td></tr>';
+}
+
+
+function renderDebtors10(){
+  const selectedCustomer=$('dashCustomer').value||'';
+  const active=records.filter(r=>!r.archived&&(!selectedCustomer||r.customer===selectedCustomer));
+
+  const grouped={};
+  active.forEach(r=>{
+    const key=(r.customer||'')+'|'+(r.currency||'');
+    if(!grouped[key])grouped[key]={customer:r.customer||'',currency:r.currency||'',debit:0,credit:0};
+    grouped[key].debit+=Number(r.debit||0);
+    grouped[key].credit+=Number(r.credit||0);
+  });
+
+  const rows=Object.values(grouped)
+    .map(x=>({...x,outstanding:x.debit-x.credit}))
+    .filter(x=>x.outstanding>0)
+    .sort((a,b)=>b.outstanding-a.outstanding)
+    .slice(0,10);
+
+  const displayRows=rows.map(x=>{
+    const invoices=active.filter(r=>
+      r.customer===x.customer && r.currency===x.currency &&
+      r.type==='Invoice' && r.piNo && r.piNo!=='Last Year'
+    ).slice().sort((a,b)=>{
+      const ad=(a.date||'').replaceAll('/',''),bd=(b.date||'').replaceAll('/','');
+      if(ad!==bd)return bd.localeCompare(ad);
+      return String(b.id||'').localeCompare(String(a.id||''));
+    });
+
+    let latestCI='—', latestBalance=0;
+    if(invoices.length){
+      latestCI=invoices[0].piNo||'—';
+      const ciRows=active.filter(r=>
+        r.customer===x.customer && r.currency===x.currency && r.piNo===latestCI
+      );
+      latestBalance=ciRows.reduce((s,r)=>s+Number(r.debit||0)-Number(r.credit||0),0);
+    }
+    return {...x,latestCI,latestBalance};
+  });
+
+  $('debtors10Body').innerHTML=displayRows.map(x=>`<tr>
+    <td><b>${x.customer}</b></td>
+    <td>${x.currency}</td>
+    <td class="danger-text"><b>${fmt(x.outstanding)}</b></td>
+    <td><b>${x.latestCI}</b></td>
+    <td class="${x.latestBalance>0?'danger-text':x.latestBalance<0?'good-text':''}"><b>${fmt(x.latestBalance)}</b></td>
+  </tr>`).join('') || '<tr><td colspan="5" class="sub">No outstanding debt.</td></tr>';
+
+  const totals={};
+  displayRows.forEach(x=>{
+    if(!totals[x.currency])totals[x.currency]={outstanding:0,latest:0};
+    totals[x.currency].outstanding+=x.outstanding;
+    totals[x.currency].latest+=x.latestBalance;
+  });
+  $('debtors10Foot').innerHTML=Object.entries(totals).map(([curr,t])=>`<tr style="background:#F8FAFC;border-top:2px solid #CBD5E1">
+    <td><b>TOTAL</b></td>
+    <td><b>${curr}</b></td>
+    <td class="danger-text"><b>${fmt(t.outstanding)}</b></td>
+    <td>—</td>
+    <td><b>${fmt(t.latest)}</b></td>
+  </tr>`).join('');
+}
+function renderLast2MonthsReceipts(){
+ const pays=records.filter(r=>!r.archived&&r.type==='Payment'&&r.date);
+ const months=[...new Set(pays.map(r=>(r.date||'').slice(0,7)).filter(x=>/^\d{4}\/\d{2}$/.test(x)))].sort((a,b)=>b.localeCompare(a)).slice(0,2);
+ const g={};pays.filter(r=>months.includes((r.date||'').slice(0,7))).forEach(r=>{
+   const month=(r.date||'').slice(0,7),key=month+'|'+(r.customer||'')+'|'+(r.currency||'');
+   if(!g[key])g[key]={month,customer:r.customer||'',currency:r.currency||'',amount:0};
+   g[key].amount+=Number(r.credit||0);
+ });
+ const rows=Object.values(g).sort((a,b)=>a.month===b.month?a.customer.localeCompare(b.customer):b.month.localeCompare(a.month));
+ $('last2MonthsBody').innerHTML=rows.map(x=>`<tr><td>${x.month}</td><td>${x.customer}</td><td>${x.currency}</td><td>${fmt(x.amount)}</td></tr>`).join('')
+ || '<tr><td colspan="4" class="sub">No recent receipts.</td></tr>';
+}
+
+function renderDashboard(){
+  renderDebtors10();
+  renderLast2MonthsReceipts();
+  const c=$('dashCustomer').value||'';
+  const rows=currentRecords(c);
+  const usd=accountBalance(rows.filter(r=>r.currency==='USD'));
+  const IRR=accountBalance(rows.filter(r=>r.currency==='IRR'));
+  $('kpiUSD').textContent=fmt(usd);$('kpiUSD').className='kpi-value '+balanceClass(usd);
+  $('kpiIRR').textContent=fmt(IRR);$('kpiIRR').className='kpi-value '+balanceClass(IRR);
+}
+
+$('dashCustomer').addEventListener('change',renderDashboard);
+
+function renderAccounts(){
+ const groups=groupBy(records,r=>r.customer+'|'+r.period+'|'+r.currency+'|'+(r.archived?'Archive':'Current'));
+ $('accountsBody').innerHTML=Object.entries(groups).sort((a,b)=>b[0].localeCompare(a[0])).map(([k,g])=>{const [customer,period,curr,state]=k.split('|'),debit=g.reduce((s,r)=>s+Number(r.debit||0),0),credit=g.reduce((s,r)=>s+Number(r.credit||0),0),bal=credit-debit;return `<tr><td>${customer}</td><td>${period} ${state==='Archive'?'<span class="pill archive">Archive</span>':''}</td><td>${curr}</td><td>${fmt(debit)}</td><td>${fmt(credit)}</td><td class="${balanceClass(bal)}"><b>${fmt(bal)}</b></td><td>${balanceMeaning(bal)}</td></tr>`}).join('');
+}
+
+$('piForm').addEventListener('submit',e=>{e.preventDefault();records.push({
+ id:'CI-'+Date.now(),date:getDate('pi'),period:$('piPeriod').value,customer:$('piCustomer').value,
+ currency:$('piCurrency').value,type:'Invoice',piNo:$('piNo').value.trim(),ciNo:$('piReference').value.trim(),
+ product:$('piProduct').value,info:$('piInfo').value.trim(),debit:+$('piAmount').value||0,credit:0,
+ paymentCurrency:'',originalAmount:0,fxRate:0,note:$('piNote').value.trim(),archived:false
+});save();e.target.reset();setupDate('pi');go('pilist')});
+$('payForm').addEventListener('submit',e=>{e.preventDefault();records.push({id:'PAY-'+Date.now(),date:getDate('pay'),period:$('payPeriod').value,customer:$('payCustomer').value,currency:$('payCurrency').value,type:'Payment',piNo:$('payCI').value.trim(),ciNo:'',product:'',debit:0,credit:+$('payCredit').value||0,paymentCurrency:$('payOriginalCurrency').value,originalAmount:+$('payOriginalAmount').value||0,fxRate:+$('payFx').value||0,currencyToIRRRate:+$('payCurrencyToIRR').value||0,note:$('payNote').value.trim(),archived:false});save();e.target.reset();setupDate('pay');refreshPaymentCIList();go('transactions')});
+$('payCustomer').addEventListener('change',refreshPaymentCIList);
+$('payCurrency').addEventListener('change',()=>{if(($('payCurrency').value||'').toUpperCase()==='USD'&&!$('payOriginalCurrency').value){$('payOriginalCurrency').value='USD';$('payFx').value='1';calcPayment();}});
+$('payOriginalAmount').addEventListener('input',calcPayment);$('payFx').addEventListener('input',calcPayment);
+function calcPayment(){const a=+$('payOriginalAmount').value||0,r=+$('payFx').value||0;if(a&&r)$('payCredit').value=(a/r).toFixed(4)}
+
+
+function renderCIList(){
+ const q=($('piSearch').value||'').toLowerCase();
+ const rows=records.filter(r=>r.type==='Invoice'&&Object.values(r).join(' ').toLowerCase().includes(q)).sort((a,b)=>{
+    const pa=String(a.ciNo||'').trim();
+    const pb=String(b.ciNo||'').trim();
+    return pa.localeCompare(pb,undefined,{numeric:true,sensitivity:'base'});
+  });
+ $('piListBody').innerHTML=rows.map(r=>{
+   const note=(r.note||'').trim();
+   const noteHtml=note?`<button class="btn secondary" onclick="showNote('${r.id}')">More</button>`:'';
+   return `<tr>
+   <td>${r.date||'-'}</td><td>${r.customer||''}</td><td>${r.currency||''}</td>
+   <td>${r.ciNo||''}</td><td><b>${r.piNo||''}</b></td><td>${r.product||''}</td><td>${r.info||''}</td>
+   <td>${fmt(r.debit)}</td><td>${noteHtml}</td>
+   <td><button class="btn secondary" onclick="editTxn('${r.id}')">Edit</button> <button class="btn danger" onclick="deleteCI('${r.id}')">Delete</button></td>
+   </tr>`;
+ }).join('');
+}
+function showNote(id){
+ const r=records.find(x=>x.id===id);if(r)alert(r.note||'');
+}
+$('piSearch').addEventListener('input',renderCIList);
+
+function deleteCI(id){
+ const r=records.find(x=>String(x.id)===String(id));
+ if(!r)return;
+ $('deleteTxnId').value=String(id);
+ $('deleteTxnInfo').textContent=`Delete CI ${r.piNo||''}${r.ciNo?' / Ref '+r.ciNo:''}? This will recalculate balances and reports.`;
+ $('deleteModalWrap').classList.remove('hidden');
+}
+
+
+function refreshUnitPriceCIList(){
+ const el=$('upeCI'); if(!el)return;
+ const customer=$('upeCustomer').value;
+ const old=el.value;
+ const cis=[...new Set(records.filter(r=>!r.archived&&r.type==='Payment'&&r.currency==='USD'&&r.piNo&&(!customer||r.customer===customer)).map(r=>r.piNo))];
+ el.innerHTML='<option value="">Select CI...</option>'+cis.map(x=>`<option>${x}</option>`).join('');
+ if(cis.includes(old))el.value=old;
+}
+
+function unitPriceStats(ci){
+ const customer=$('upeCustomer').value;
+ const pays=records.filter(r=>!r.archived&&r.type==='Payment'&&r.currency==='USD'&&r.piNo===ci&&(!customer||r.customer===customer));
+ const currencies=[...new Set(pays.map(r=>r.paymentCurrency).filter(Boolean))];
+ const directUsdRates=[],otherCurrencyRates=[],impliedUsdRates=[],allEffectiveUsdRates=[];
+
+ pays.forEach(r=>{
+   const currency=(r.paymentCurrency||((r.currency||'').toUpperCase()==='USD'?'USD':'')).toUpperCase();
+   const currencyToIRR=Number(r.currencyToIRRRate||0);
+   const fx=Number(r.fxRate||0); // units of payment currency per USD when account currency is USD
+
+   if(currency==='USD' && currencyToIRR>0){
+     directUsdRates.push(currencyToIRR);allEffectiveUsdRates.push(currencyToIRR);
+   } else if(currency && currency!=='USD' && currencyToIRR>0 && fx>0){
+     otherCurrencyRates.push(currencyToIRR);
+     const impliedUSD=currencyToIRR*fx;
+     impliedUsdRates.push(impliedUSD);allEffectiveUsdRates.push(impliedUSD);
+   }
+ });
+ const mean=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:0;
+ const avgUSD=mean(directUsdRates);
+ const avgAED=mean(otherCurrencyRates);
+ const impliedUSD=mean(impliedUsdRates);
+ const effectiveUSD=mean(allEffectiveUsdRates);
+ return {pays,currencies,avgUSD,avgAED,impliedUSD,effectiveUSD};
+}
+
+function renderUnitPriceEstimation(){
+ const ci=$('upeCI').value;
+ if(!ci){
+   $('upeCurrency').textContent='—';
+   $('upeAvgUSDtoIRR').textContent='0';
+   $('upeAvgAEDtoIRR').textContent='0';
+   $('upeImpliedUSD').textContent='0';
+   $('upeUnitPriceIRR').textContent='0';
+   $('upeBody').innerHTML='';
+   return;
+ }
+ const st=unitPriceStats(ci);
+ $('upeCurrency').textContent=st.currencies.length?st.currencies.join(' / '):'—';
+ $('upeAvgUSDtoIRR').textContent=fmt(st.avgUSD);
+ $('upeAvgAEDtoIRR').textContent=fmt(st.avgAED);
+ $('upeImpliedUSD').textContent=fmt(st.impliedUSD);
+
+ const unit=+$('upeUnitPrice').value||0;
+ $('upeUnitPriceIRR').textContent=fmt(unit*st.effectiveUSD);
+
+ $('upeBody').innerHTML=st.pays.slice().sort((a,b)=>{
+   const ad=(a.date||'').replaceAll('/',''),bd=(b.date||'').replaceAll('/','');
+   if(ad!==bd)return bd.localeCompare(ad);
+   return String(b.id).localeCompare(String(a.id));
+ }).map(r=>{
+   const fx=Number(r.fxRate||0),currencyRate=Number(r.currencyToIRRRate||0);
+   const currency=(r.paymentCurrency||((r.currency||'').toUpperCase()==='USD'?'USD':'')).toUpperCase();
+   const directUSD=(currency==='USD'&&currencyRate>0)?currencyRate:0;
+   const otherRate=(currency!=='USD'&&currencyRate>0)?currencyRate:0;
+   const impliedUSD=currency==='USD'?directUSD:(otherRate>0&&fx>0?otherRate*fx:0);
+   return `<tr>
+     <td>${r.date||'-'}</td><td>${r.paymentCurrency||(((r.currency||'').toUpperCase()==='USD')?'USD':'')}</td><td>${fmt(r.originalAmount||0)}</td>
+     <td>${fmt(r.credit||0)}</td>
+     <td>${currency==='USD'
+       ? `<input id="upeRate_${r.id}" type="number" step="any" min="0" value="${currencyRate||''}" placeholder="Enter USD sale rate" style="min-width:150px;padding:7px 9px">`
+       : (directUSD?fmt(directUSD):'-')}</td>
+     <td>${otherRate?fmt(otherRate):'-'}</td><td>${impliedUSD?fmt(impliedUSD):'-'}</td>
+     <td>${currency==='USD'?`<button class="btn green" type="button" onclick="saveUpeUsdRate('${r.id}')">Save Rate</button>`:'-'}</td>
+   </tr>`;
+ }).join('');
+}
+
+
+function saveUpeUsdRate(id){
+  const r=records.find(x=>String(x.id)===String(id));
+  if(!r)return;
+  const input=$('upeRate_'+id);
+  const rate=Number(input&&input.value||0);
+  if(rate<=0){alert('Enter a valid USD sale rate to IRR.');return;}
+  r.currencyToIRRRate=rate;
+  if(!r.paymentCurrency && String(r.currency||'').toUpperCase()==='USD') r.paymentCurrency='USD';
+  if(!r.fxRate || Number(r.fxRate)<=0) r.fxRate=1;
+  const keepCustomer=$('upeCustomer').value;
+  const keepCI=r.piNo||$('upeCI').value;
+  save();
+  $('upeCustomer').value=keepCustomer;
+  refreshUnitPriceCIList();
+  $('upeCI').value=keepCI;
+  renderUnitPriceEstimation();
+}
+
+$('upeCustomer').addEventListener('change',()=>{refreshUnitPriceCIList();renderUnitPriceEstimation();});
+$('upeCI').addEventListener('change',renderUnitPriceEstimation);
+$('upeUnitPrice').addEventListener('input',renderUnitPriceEstimation);
+
+
+function refreshPaymentCIList(){
+ const el=$('payCI'); if(!el)return;
+ const customer=$('payCustomer').value;
+ const old=el.value;
+ const invoices=records.filter(r=>!r.archived&&r.type==='Invoice'&&r.piNo&&(!customer||r.customer===customer))
+   .slice().sort((a,b)=>{const ak=sortKey(a),bk=sortKey(b);if(ak[0]!==bk[0])return bk[0].localeCompare(ak[0]);return bk[1].localeCompare(ak[1])});
+ const seen=new Set(),latest=[];
+ for(const r of invoices){
+   const key=(r.customer||'')+'|'+(r.currency||'')+'|'+(r.piNo||'');
+   if(seen.has(key))continue;seen.add(key);latest.push(r);if(latest.length===10)break;
+ }
+ el.innerHTML='<option value="">Select CI...</option>'+latest.map(r=>{
+   const details=[r.piNo,r.product||'',r.info||'',r.note||''].filter(Boolean).join(' — ');
+   return `<option value="${r.piNo}">${details}</option>`;
+ }).join('');
+ if(latest.some(r=>r.piNo===old))el.value=old;
+}
+
+
+
+function registerOpeningBalance(){
+ const customer=$('obCustomer').value,currency=$('obCurrency').value,period=$('obPeriod').value;
+ const amount=+$('obAmount').value||0;
+ if(!customer||!currency||!period||amount<=0){alert('Select customer, currency, financial period and enter opening balance.');return;}
+ records.push({
+   id:'OB-'+Date.now(),date:`${period}/01/01`,period,customer,currency,type:'Opening Balance',
+   piNo:'',ciNo:'',product:'',info:'',debit:amount,credit:0,paymentCurrency:'',
+   originalAmount:0,fxRate:0,currencyToIRRRate:0,note:$('obNote').value.trim(),archived:false
+ });
+ save();
+ $('obAmount').value='';$('obNote').value='';
+ alert('Opening balance registered.');
+}
+
+function sortKey(r){return [(r.date||'').replaceAll('/',''),String(r.id||'')]}
+function renderTransactions(){
+ const q=($('txnSearch').value||'').toLowerCase();
+ const rows=records.filter(r=>!r.archived&&r.type==='Payment'&&Object.values(r).join(' ').toLowerCase().includes(q))
+   .slice().sort((a,b)=>{const ak=sortKey(a),bk=sortKey(b);if(ak[0]!==bk[0])return bk[0].localeCompare(ak[0]);return bk[1].localeCompare(ak[1])});
+ $('txnBody').innerHTML=rows.map(r=>`<tr>
+   <td>${r.date||'-'}</td><td>${r.customer||''}</td><td>${r.period||''}</td><td>${r.currency||''}</td>
+   <td>${r.piNo||''}</td><td>${r.ciNo||''}</td><td>${r.paymentCurrency||(((r.currency||'').toUpperCase()==='USD')?'USD':'')}</td>
+   <td>${fmt(r.originalAmount||0)}</td><td>${fmt(r.credit||0)}</td>
+   <td>${r.currencyToIRRRate?fmt(r.currencyToIRRRate):'-'}</td><td>${r.note||''}</td>
+   <td><button class="btn secondary" onclick="editTxn('${r.id}')">Edit</button> <button class="btn danger" onclick="deleteTxn('${r.id}')">Delete</button></td>
+ </tr>`).join('') || '<tr><td colspan="12" class="sub">No payments found.</td></tr>';
+}
+$('txnSearch').addEventListener('input',renderTransactions);function editTxn(id){
+ const r=records.find(x=>x.id===id); if(!r)return;
+ $('editTxnId').value=r.id;
+ $('editCustomer').value=r.customer||'';$('editType').value=r.type||'Invoice';
+ 
+ $('editCurrency').value=r.currency||'';
+ $('editPeriod').value=r.period||'';
+ $('editDate').value=r.date||'';
+ $('editReference').value=r.ciNo||'';
+ $('editCI').value=r.piNo||'';
+ $('editProduct').value=r.product||'';
+ $('editDebit').value=Number(r.debit||0); $('editInfo').value=r.info||'';
+ $('editCredit').value=Number(r.credit||0);
+ $('editPaymentCurrency').value=r.paymentCurrency||(((r.currency||'').toUpperCase()==='USD')?'USD':'');
+ $('editOriginalAmount').value=Number(r.originalAmount||0);
+ $('editFxRate').value=Number(r.fxRate||0); $('editCurrencyToIRR').value=Number(r.currencyToIRRRate||0);
+ $('editNote').value=r.note||'';
+ $('editModalWrap').classList.remove('hidden');
+}
+function closeTxnEdit(){$('editModalWrap').classList.add('hidden')}
+function saveTxnEdit(){
+ const id=$('editTxnId').value;
+ const i=records.findIndex(x=>x.id===id); if(i<0)return;
+ records[i]={
+   ...records[i],
+   customer:$('editCustomer').value,type:$('editType').value,
+   currency:$('editCurrency').value,
+   period:$('editPeriod').value,
+   date:$('editDate').value.trim(),
+   piNo:$('editCI').value.trim(),
+   ciNo:$('editReference').value.trim(),
+   product:$('editProduct').value,
+   debit:+$('editDebit').value||0,
+   credit:+$('editCredit').value||0,
+   paymentCurrency:$('editPaymentCurrency').value,
+   originalAmount:+$('editOriginalAmount').value||0,
+   fxRate:+$('editFxRate').value||0,currencyToIRRRate:+$('editCurrencyToIRR').value||0,
+   note:$('editNote').value.trim()
+ };
+ save(); closeTxnEdit(); renderCIList(); renderTransactions();
+}
+
+function deleteTxn(id){
+ const r=records.find(x=>String(x.id)===String(id)); if(!r)return;
+ $('deleteTxnId').value=String(id);
+ $('deleteTxnInfo').textContent=`Delete ${r.type||'transaction'}${r.piNo?' – CI '+r.piNo:''}? This will recalculate balances and reports.`;
+ $('deleteModalWrap').classList.remove('hidden');
+}
+function closeDeleteTxn(){
+ $('deleteModalWrap').classList.add('hidden');
+ $('deleteTxnId').value='';
+}
+function confirmDeleteTxn(){
+ const id=$('deleteTxnId').value;
+ const before=records.length;
+ records=records.filter(r=>String(r.id)!==String(id));
+ if(records.length===before){alert('Transaction was not found.');return;}
+ save();
+ closeDeleteTxn();
+ renderCIList();
+ renderTransactions();
+ renderDashboard();
+ generateReport();
+}
+
+function normalizeDate(s){return String(s||'').replaceAll('/','')}
+function reportRows(){
+ const c=$('repCustomer').value,curr=$('repCurrency').value,p=$('repPeriod').value,from=normalizeDate($('repFrom').value),to=normalizeDate($('repTo').value);
+ return records.filter(r=>(!c||r.customer===c)&&(!curr||r.currency===curr)&&(!p||r.period===p)&&(!from||normalizeDate(r.date)>=from)&&(!to||normalizeDate(r.date)<=to)).sort((a,b)=>{const ak=sortKey(a),bk=sortKey(b);if(ak[0]!==bk[0])return bk[0].localeCompare(ak[0]);return bk[1].localeCompare(ak[1])});
+}
+function generateReport(){
+ const rows=reportRows(),
+ debit=rows.reduce((s,r)=>s+Number(r.debit||0),0),
+ credit=rows.reduce((s,r)=>s+Number(r.credit||0),0),
+ bal=credit-debit;
+ $('repDebit').textContent=fmt(debit);
+ $('repCredit').textContent=fmt(credit);
+ $('repBalance').textContent=fmt(bal);
+ $('repBalance').className=balanceClass(bal);
+ $('repCount').textContent=rows.length;
+ $('repMeta').textContent=[$('repCustomer').value||'All Customers',$('repCurrency').value||'All Currencies',$('repPeriod').value||'All Periods'].join(' | ');
+ $('repGenerated').textContent='Generated: '+new Date().toLocaleString();
+
+ // Running balance must be calculated from oldest to newest,
+ // while the report itself remains displayed newest first.
+ const chronological=rows.slice().reverse();
+ let run=0;
+ const runningById=new Map();
+ chronological.forEach(r=>{
+   run+=Number(r.credit||0)-Number(r.debit||0);
+   runningById.set(String(r.id),run);
+ });
+ $('repBody').innerHTML=rows.map(r=>`<tr><td>${r.customer||''}</td><td>${r.date||'-'}</td><td>${r.piNo||''}</td><td>${r.product||''}</td><td>${r.info||''}</td><td>${r.type}</td><td>${fmt(r.debit)}</td><td>${fmt(r.credit)}</td><td>${fmt(runningById.get(String(r.id))||0)}</td><td>${r.note||''}</td></tr>`).join('');
+}
+function printReport(){generateReport();window.print()}
+
+let backupDirHandle=null;
+async function selectBackupFolder(){if(!window.showDirectoryPicker){alert('Use Microsoft Edge or Chrome for folder selection.');return}try{backupDirHandle=await window.showDirectoryPicker({mode:'readwrite'});$('backupStatus').textContent='Backup folder selected: '+backupDirHandle.name}catch(e){}}
+async function exportBackup(){const payload={records,lists,backupDate:new Date().toISOString()},content=JSON.stringify(payload,null,2),name='customer-balance-backup-'+new Date().toISOString().replace(/[:.]/g,'-')+'.json';if(backupDirHandle){try{const perm=await backupDirHandle.requestPermission({mode:'readwrite'});if(perm==='granted'){const fh=await backupDirHandle.getFileHandle(name,{create:true}),w=await fh.createWritable();await w.write(content);await w.close();$('backupStatus').textContent='Backup saved: '+backupDirHandle.name+' / '+name;return}}catch(e){}}const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type:'application/json'}));a.download=name;a.click()}
+$('importBackup').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const x=JSON.parse(await f.text());if(!Array.isArray(x.records)||!x.lists)throw 0;records=x.records;lists=x.lists;save();alert('Backup imported.')}catch{alert('Invalid backup file.')}})
+
+const deleteWrap=$('deleteModalWrap');
+if(deleteWrap){deleteWrap.addEventListener('click',e=>{if(e.target===deleteWrap)closeDeleteTxn()});}
+const confirmDeleteBtn=$('confirmDeleteBtn'); if(confirmDeleteBtn)confirmDeleteBtn.addEventListener('click',confirmDeleteTxn);
+const cancelDeleteBtn=$('cancelDeleteBtn'); if(cancelDeleteBtn)cancelDeleteBtn.addEventListener('click',closeDeleteTxn);
+
+const editWrap=$('editModalWrap');
+if(editWrap){editWrap.addEventListener('click',e=>{if(e.target===editWrap)closeTxnEdit()});}
+
+
+
+function renderAll(){refreshPaymentCIList();refreshUnitPriceCIList();renderDashboard();renderAccounts();renderCIList();renderTransactions();generateReport();renderUnitPriceEstimation()}
+
+let allowUnload=false;
+
+async function exitApp(){
+ const wantsBackup=confirm('Before closing, do you want to choose where to save a backup?');
+ if(wantsBackup){
+   const payload={records,lists,backupDate:new Date().toISOString()};
+   const content=JSON.stringify(payload,null,2);
+   const name='customer-balance-backup-'+new Date().toISOString().replace(/[:.]/g,'-')+'.json';
+
+   if(window.showSaveFilePicker){
+     try{
+       const fh=await window.showSaveFilePicker({
+         suggestedName:name,
+         types:[{description:'JSON Backup',accept:{'application/json':['.json']}}]
+       });
+       const w=await fh.createWritable();
+       await w.write(content);
+       await w.close();
+       $('backupStatus').textContent='Backup saved: '+fh.name;
+     }catch(e){
+       if(e && e.name==='AbortError') return;
+       alert('Backup could not be saved. The app will stay open.');
+       return;
+     }
+   }else{
+     // Fallback for browsers without Save File Picker
+     const a=document.createElement('a');
+     a.href=URL.createObjectURL(new Blob([content],{type:'application/json'}));
+     a.download=name;
+     a.click();
+     await new Promise(resolve=>setTimeout(resolve,300));
+   }
+ }else{
+   if(!confirm('Close without saving a backup?')) return;
+ }
+
+ // Browsers may block scripts from closing a tab opened manually.
+ try{window.close()}catch(e){}
+}
+
+window.addEventListener('beforeunload',function(e){
+ if(allowUnload)return;
+ e.preventDefault();
+ e.returnValue='';
+});
+
+refreshLists();renderAll();
+</script>
+
+<script>
+if('serviceWorker' in navigator && location.protocol!=='file:'){
+ window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}));
+}
+</script></body>
+</html>
